@@ -41,7 +41,7 @@
         }
         else {
             //非后台模式
-            centralManager = [[CBCentralManager alloc]initWithDelegate:self queue:nil];
+            centralManager = [[CBCentralManager alloc]initWithDelegate:self queue:nil options:@{CBCentralManagerOptionShowPowerAlertKey:@(NO)}];
         }
         
         //pocket
