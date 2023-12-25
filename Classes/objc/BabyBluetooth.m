@@ -18,6 +18,8 @@
     BabySpeaker *babySpeaker;
     int CENTRAL_MANAGER_INIT_WAIT_TIMES;
     NSTimer *timerForStop;
+    int CENTRAL_MANAGER_INIT_MAX_WAIT_TIMES;
+    int CENTRAL_MANAGER_INIT_WAIT_SECOND;
 }
 //单例模式
 + (instancetype)shareBabyBluetooth {
@@ -39,11 +41,21 @@
         
         babyPeripheralManager = [[BabyPeripheralManager alloc]init];
         babyPeripheralManager->babySpeaker = babySpeaker;
+        CENTRAL_MANAGER_INIT_MAX_WAIT_TIMES = KBABY_CENTRAL_MANAGER_INIT_WAIT_TIMES;
+        CENTRAL_MANAGER_INIT_WAIT_SECOND = KBABY_CENTRAL_MANAGER_INIT_WAIT_SECOND;
     }
     return self;
     
 }
+- (void)setCenterManagerMAXWaitTimes:(int)times
+{
+    CENTRAL_MANAGER_INIT_MAX_WAIT_TIMES = times;
+}
 
+- (void)setCenterManagerWaitSecond:(int)second
+{
+    CENTRAL_MANAGER_INIT_WAIT_SECOND = second;
+}
 #pragma mark - babybluetooth的委托
 /*
  默认频道的委托
@@ -398,12 +410,12 @@
     }
     //尝试重新等待CBCentralManager打开
     CENTRAL_MANAGER_INIT_WAIT_TIMES ++;
-    if (CENTRAL_MANAGER_INIT_WAIT_TIMES >= KBABY_CENTRAL_MANAGER_INIT_WAIT_TIMES ) {
+    if (CENTRAL_MANAGER_INIT_WAIT_TIMES >= CENTRAL_MANAGER_INIT_MAX_WAIT_TIMES ) {
         BabyLog(@">>> 第%d次等待CBCentralManager 打开任然失败，请检查你蓝牙使用权限或检查设备问题。",CENTRAL_MANAGER_INIT_WAIT_TIMES);
         return;
         //[NSException raise:@"CBCentralManager打开异常" format:@"尝试等待打开CBCentralManager5次，但任未能打开"];
     }
-    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, KBABY_CENTRAL_MANAGER_INIT_WAIT_SECOND * NSEC_PER_SEC);
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CENTRAL_MANAGER_INIT_WAIT_SECOND * NSEC_PER_SEC);
     dispatch_after(popTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         [self start:cachedPeripheral];
     });
@@ -445,6 +457,7 @@
     babyCentralManager->needReadValueForCharacteristic = NO;
     babyCentralManager->needDiscoverDescriptorsForCharacteristic = NO;
     babyCentralManager->needReadValueForDescriptors = NO;
+    CENTRAL_MANAGER_INIT_WAIT_TIMES = 0;
 }
 
 //持有对象

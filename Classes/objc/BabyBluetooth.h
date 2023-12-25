@@ -24,7 +24,11 @@
 @interface BabyBluetooth : NSObject
 
 #pragma mark - babybluetooth的委托
+/**设置CBcentralManager等待设备打开次数*/
+- (void)setCenterManagerMAXWaitTimes:(int)times;
 
+/**设置CBcentralManager等待设备打开间隔时间**/
+- (void)setCenterManagerWaitSecond:(int)second;
 //默认频道的委托
 
 /**
